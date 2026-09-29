@@ -1,0 +1,21 @@
+loaded ./extensions/deu-tui/config.ts
+loaded ./extensions/deu-tui/editor.ts
+loaded ./extensions/deu-tui/footer.ts
+loaded ./extensions/deu-tui/fullscreen-scroll.ts
+loaded ./extensions/deu-tui/git.ts
+loaded ./extensions/deu-tui/header.ts
+loaded ./extensions/deu-tui/icons.ts
+loaded ./extensions/deu-tui/index.ts
+loaded ./extensions/deu-tui/peek.ts
+loaded ./extensions/deu-tui/runtime.ts
+loaded ./extensions/deu-tui/session-lifecycle.ts
+loaded ./extensions/deu-tui/settings-command.ts
+loaded ./extensions/deu-tui/state.ts
+loaded ./extensions/deu-tui/telemetry.ts
+loaded ./extensions/deu-tui/utils.ts
+glyphs ascii keys: 27
+glyphs nerd keys: 27
+strip: [rojo]
+duration: 1m 30s tokens: 1.5k
+git empty: {"ahead":0,"behind":0,"modified":0,"untracked":0,"staged":0,"stashed":0,"conflicted":0,"renamed":0,"deleted":0,"commit":null}
+TUI-SMOKE-OK

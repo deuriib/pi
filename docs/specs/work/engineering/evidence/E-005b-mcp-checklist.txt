@@ -1,0 +1,22 @@
+# E-005b: threat checklist MCP (REQ-005, condición C-001)
+
+**Fecha:** 2026-09-29
+**Fuente:** `docs/specs/work/reviews/SPEC-deu-vendor/security-review.md` (veredicto Conditional)
+
+## Allowlist congelada (2 URLs, registro best-effort en `packages/deu/extensions/deu-mcp.ts`)
+
+| Servidor | URL | Herramientas |
+|----------|-----|--------------|
+| context7 | `https://mcp.context7.com/mcp` | directas (`directTools: true`) |
+| parallel-search | `https://search.parallel.ai/mcp` | directas (`directTools: true`) |
+
+## Verificado
+
+- [x] Cero secretos/tokens en `deu-mcp.ts` y `deu-core.ts` (grep: sin `sk-`, `token`, `secret`, `Bearer`)
+- [x] Registro envuelto en try/catch, sin bloqueo de sesión
+- [x] Añadir una URL exige nuevo `check-security` (condición C-001 heredada)
+- [x] Guard T-005a verde (ver TESTS.md): 6 patrones + permitido + UI/no-UI
+
+## Riesgo residual aceptado
+
+Respuestas MCP como vector de prompt injection (2 fuentes declaradas); fallback `shell: true` del launcher solo sin `pi-launcher.js`. Owners: security / engineering.

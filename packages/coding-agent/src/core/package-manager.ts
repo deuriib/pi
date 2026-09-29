@@ -555,6 +555,26 @@ function collectAutoThemeEntries(dir: string): string[] {
 	return entries;
 }
 
+/**
+ * Resolve a package-manifest resource entry. Literal first (registry installs
+ * keep working identically); on miss, walk ancestors so entries under
+ * `./node_modules/*` keep resolving when npm hoists them to a parent
+ * (workspace dev). Only package-relative entries qualify; absolute and bare
+ * specifiers keep the old behavior.
+ */
+function resolveManifestEntry(entry: string, root: string): string {
+	const literal = resolve(root, entry);
+	if (existsSync(literal)) return literal;
+	if (!entry.startsWith("./") && !entry.startsWith("../")) return literal;
+	let dir = dirname(root);
+	while (dir !== dirname(dir)) {
+		const candidate = resolve(dir, entry);
+		if (existsSync(candidate)) return candidate;
+		dir = dirname(dir);
+	}
+	return literal;
+}
+
 function resolveExtensionEntries(dir: string): string[] | null {
 	const packageJsonPath = join(dir, "package.json");
 	if (existsSync(packageJsonPath)) {
@@ -2349,7 +2369,7 @@ export class DefaultPackageManager implements PackageManager {
 		const sourceEntries = entries.filter((entry) => !isOverridePattern(entry));
 		const resolved = sourceEntries.flatMap((entry) => {
 			if (!hasGlobPattern(entry)) {
-				return [resolve(root, entry)];
+				return [resolveManifestEntry(entry, root)];
 			}
 
 			return expandPackageGlob(entry, root);

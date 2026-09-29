@@ -1,13 +1,14 @@
 {
 	"name": "@earendil-works/pi-coding-agent",
 	"version": "0.87.1",
-	"description": "Coding agent CLI with read, bash, edit, write tools and session management",
+	"description": "Deu agent CLI (rebrand de Pi, fork deuriib/pi) con read, bash, edit, write tools y session management",
 	"type": "module",
 	"piConfig": {
-		"configDir": ".pi"
+		"name": "deu",
+		"configDir": ".deu"
 	},
 	"bin": {
-		"pi": "dist/bundle/cli.js"
+		"deu": "dist/bundle/cli.js"
 	},
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",

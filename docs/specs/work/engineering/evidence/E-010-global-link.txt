@@ -1,0 +1,27 @@
+# E-010: bin global + package instalado (nivel global)
+
+**Fecha:** 2026-09-29
+**Síntoma:** `deu` global resolvía al bundle pelado de coding-agent linkeado
+(0.87.1) sin launcher, sin `PI_CODING_AGENT_DIR=.deu` y sin package deu.
+
+## Cambios en el entorno (reversibles, fuera del repo)
+
+- `npm link --force` de `packages/deu` en el prefix de mise: `deu` →
+  `node_modules/deu/dist/index.js` (launcher; antes bundle de coding-agent).
+  Reversión: `npm unlink -g deu` + re-link de coding-agent si se desea.
+- `deu install D:/2-Areas/GitHub/pi/packages/deu` (global): `deu list`
+  muestra el user package. Reversión: `deu remove <path>`.
+
+## Verificado
+
+- [x] `deu --version` → 0.87.1 (versión del runtime delegado, esperado)
+- [x] `deu -p` global: boot limpio hasta auth gate (sin API keys en el env),
+  cero errores de carga con el package instalado
+- [x] Calibración previa: `-e` con path roto sí reporta error → el silencio
+  es prueba de carga real
+
+## Pendiente (requiere credenciales / TTY del usuario)
+
+- Round-trip de modelo (`/login` primero)
+- Render interactivo de `deu-tui` (header/logo) en terminal real
+- `deu config` para toggles de recursos del package

@@ -1,0 +1,51 @@
+# diff -rq ../deu packages/deu (solo diferencias)
+Only in ../deu: .gitattributes
+Only in ../deu: .gitignore
+Files ../deu/extensions/deu-core.ts and packages/deu/extensions/deu-core.ts differ
+Files ../deu/extensions/deu-mcp.ts and packages/deu/extensions/deu-mcp.ts differ
+Files ../deu/extensions/deu-tui/header.ts and packages/deu/extensions/deu-tui/header.ts differ
+Files ../deu/extensions/deu-tui/index.ts and packages/deu/extensions/deu-tui/index.ts differ
+Files ../deu/extensions/deu-tui/settings-command.ts and packages/deu/extensions/deu-tui/settings-command.ts differ
+Files ../deu/lib/index.ts and packages/deu/lib/index.ts differ
+Files ../deu/package.json and packages/deu/package.json differ
+Only in ../deu: package-lock.json
+Files ../deu/README.md and packages/deu/README.md differ
+Only in packages/deu: test
+
+# detalle cambios .ts (deben ser solo imports .js->.ts)
+      2 +} from "./config.ts";
+      2 -} from "./config.js";
+      1 -import { SessionLifecycle } from "./session-lifecycle.js";
+      1 -import { resolveGlyphs } from "./icons.js";
+      1 -import { registerSettingsCommand } from "./settings-command.js";
+      1 -import { readRuntimeInfo } from "./runtime.js";
+      1 -import { packageRoot } from "../lib/index.js";
+      1 -import { installHeader } from "./header.js";
+      1 -import { installFooter } from "./footer.js";
+      1 -import { installEditor } from "./editor.js";
+      1 -import { getPackageMeta, packageRoot } from "../lib/index.js";
+      1 -import { getPackageMeta } from "../../lib/pkg-meta.js";
+      1 -import { formatTurnTelemetry, TurnTelemetryTracker } from "./telemetry.js";
+      1 -import { emptyGitStatus, readGitStatus } from "./git.js";
+      1 -export type { PackageMeta } from "./pkg-meta.js";
+      1 -export { getPackageMeta, packageRoot } from "./pkg-meta.js";
+      1 +import { SessionLifecycle } from "./session-lifecycle.ts";
+      1 +import { resolveGlyphs } from "./icons.ts";
+      1 +import { registerSettingsCommand } from "./settings-command.ts";
+      1 +import { readRuntimeInfo } from "./runtime.ts";
+      1 +import { packageRoot } from "../lib/index.ts";
+      1 +import { installHeader } from "./header.ts";
+      1 +import { installFooter } from "./footer.ts";
+      1 +import { installEditor } from "./editor.ts";
+      1 +import { getPackageMeta, packageRoot } from "../lib/index.ts";
+      1 +import { getPackageMeta } from "../../lib/pkg-meta.ts";
+      1 +import { formatTurnTelemetry, TurnTelemetryTracker } from "./telemetry.ts";
+      1 +import { emptyGitStatus, readGitStatus } from "./git.ts";
+      1 +export type { PackageMeta } from "./pkg-meta.ts";
+      1 +export { getPackageMeta, packageRoot } from "./pkg-meta.ts";
+      1 +} from "./state.ts";
+      1 +} from "./peek.ts";
+      1 +} from "./fullscreen-scroll.ts";
+      1 -} from "./state.js";
+      1 -} from "./peek.js";
+      1 -} from "./fullscreen-scroll.js";

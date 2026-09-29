@@ -1,0 +1,10 @@
+# bin declarado por package (convención monorepo, paridad con ../deu)
+packages/coding-agent/package.json:10:	"bin": {
+packages/coding-agent/package.json-11-		"deu": "dist/bundle/cli.js"
+packages/coding-agent/package.json-12-	},
+--
+packages/deu/package.json:52:  "bin": {
+packages/deu/package.json-53-    "deu": "./index.ts"
+packages/deu/package.json-54-  },
+# .bin/deu efectivo en dev
+deu - AI coding assistant with read, bash, edit, write tools

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "pi-agent": {
+      "source": "deuriib/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/pi-agent/SKILL.md",
+      "computedHash": "a707939ebdb4ddc8f06195881cb12de5b63ac75e94ffe9461844b4f6939e8338"
+    }
+  }
+}
