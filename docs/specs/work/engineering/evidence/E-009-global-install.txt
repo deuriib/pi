@@ -1,0 +1,22 @@
+# E-009: instalabilidad global (registry simulation)
+
+**Fecha:** 2026-09-29
+**Método:** `npm pack` + `npm install --prefix /tmp/deu-global-test` del tarball (sin tocar el entorno global; prefijo temporal ya eliminado)
+
+## Verificado
+
+- [x] `@earendil-works/pi-{ai,coding-agent,tui}@0.87.1` publicados en el registry (resuelven sin workspace)
+- [x] `npm pack` incluye bin, dist, extensions, lib, skills, prompts, SYSTEM/APPEND (ver `npm pack --dry-run`)
+- [x] Instalación del tarball limpia; 11/11 paths del bloque `pi` resuelven (hoisted o nested)
+- [x] `deu --help` funciona desde el bin instalado (launcher delega al runtime pi ambiente)
+- [x] `-e` con las 3 extensiones instaladas carga sin errores de módulo (solo auth gate, sin API keys)
+- [x] `check:pinned-deps` + `check:ts-imports` verdes tras los cambios
+
+## Hallazgo que motivó `dist/` (bloqueante global, resuelto)
+
+`bin → ./index.ts` falla instalado: Node prohíbe type-stripping bajo `node_modules`
+(`ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`). Decisión: launcher compilado con
+esbuild a `dist/index.js` (shebang preservado, 1.6kB, solo builtins+lib); `bin`
+apunta ahí; `files[]` incluye `dist/` (gitignored en dev); `prepublishOnly` lo
+regenera. Las extensiones siguen en `.ts`: el runtime las carga por su propio
+loader (igual que `pi-mcp-adapter/index.ts`).

@@ -1,0 +1,7 @@
+pi-tui -> file:///D:/2-Areas/GitHub/pi/packages/tui/dist/index.js
+pi-coding-agent -> file:///D:/2-Areas/GitHub/pi/packages/coding-agent/dist/index.js
+pi-ai -> file:///D:/2-Areas/GitHub/pi/packages/ai/dist/index.js
+deu-tui default: function
+deu-core default: function
+pkg-meta: {"name":"deu","version":"0.1.0"}
+LOCAL-PROOF-OK

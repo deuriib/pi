@@ -1,0 +1,35 @@
+# E-011: deu-mcp auto-reparo del adapter (warning del usuario)
+
+**Fecha:** 2026-09-29
+**Síntoma (TUI global):** `deu-mcp: no se pudo registrar MCP
+(pi-mcp-adapter is not installed for this Pi instance)`
+
+## Causa
+
+`registerMcpServer` exige la extensión del adapter instalada en la instancia
+(`runtimeRegistrars` o listener del evento). La entrada
+`./node_modules/pi-mcp-adapter/index.ts` del bloque `pi` no resuelve en la
+instancia instalada → el registro revienta y el catch notificaba el warning.
+
+## Prueba pre-fix (probe tsx con pi simulado)
+
+- notifications: ["deu-mcp: no se pudo registrar MCP (pi-mcp-adapter is not installed for this Pi instance)"]
+- context7 / parallel-search: MISSING (mismo error)
+
+## Fix (`packages/deu/extensions/deu-mcp.ts`)
+
+Si el registro falla con `not installed for this Pi instance`, instala el
+adapter en el `pi` vivo (su default export es la extensión) y reintenta una
+vez. Si el adapter ya estaba, el primer intento gana y no hay doble
+instalación. Último fallo → mismo warning de antes (sin regresión).
+
+## Prueba post-fix (mismo probe)
+
+- notifications: []
+- adapter instala y su handler de sesión corre limpio
+- snapshots: `no active state` en el simulado (el estado activo requiere el
+  ciclo de vida real; prueba viva = reiniciar `deu`)
+
+## Gates
+
+- tests 15/15, `node --check` OK, pinned-deps + ts-imports OK
