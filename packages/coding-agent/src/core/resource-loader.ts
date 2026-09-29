@@ -68,8 +68,10 @@ function resolvePromptInput(input: string | undefined, description: string): str
 	return input;
 }
 
-function loadContextFileFromDir(dir: string): { path: string; content: string } | null {
-	const candidates = ["AGENTS.override.md", "AGENTS.md", "AGENTS.MD", "CLAUDE.md", "CLAUDE.MD"];
+const AGENTS_FAMILY = ["AGENTS.override.md", "AGENTS.md", "AGENTS.MD", "CLAUDE.md", "CLAUDE.MD"];
+const DESIGN_FAMILY = ["DESIGN.override.md", "DESIGN.md", "DESIGN.MD"];
+
+function loadFirstExisting(dir: string, candidates: string[]): { path: string; content: string } | null {
 	for (const filename of candidates) {
 		const filePath = join(dir, filename);
 		if (existsSync(filePath)) {
@@ -90,30 +92,47 @@ function loadContextFileFromDir(dir: string): { path: string; content: string } 
 }
 
 /**
- * The main repo's context file that a nested linked worktree's own copy shadows: both
+ * Load context files from a directory: the AGENTS-family winner (existing
+ * precedence) plus the DESIGN-family winner. DESIGN.md supplements AGENTS.md;
+ * one never shadows the other within the same directory.
+ */
+function loadContextFilesFromDir(dir: string): Array<{ path: string; content: string }> {
+	const files: Array<{ path: string; content: string }> = [];
+	const agentsFile = loadFirstExisting(dir, AGENTS_FAMILY);
+	if (agentsFile) {
+		files.push(agentsFile);
+	}
+	const designFile = loadFirstExisting(dir, DESIGN_FAMILY);
+	if (designFile) {
+		files.push(designFile);
+	}
+	return files;
+}
+
+/**
+ * The main repo's context files that a nested linked worktree's own copies shadow: both
  * occupy the same logical repository scope, so loading both applies that context twice. Returns
- * undefined when nothing is shadowed, leaving normal ancestor inheritance alone.
+ * an empty array when nothing is shadowed, leaving normal ancestor inheritance alone.
  *
  * Returned canonicalized (realpath), because `git worktree add` writes the `.git`
  * file's `gitdir:` target in realpath form while cwd may still be symlinked
  * (macOS `/tmp` -> `/private/tmp`).
  */
-function findShadowedContextFile(cwd: string): string | undefined {
+function findShadowedContextFiles(cwd: string): string[] {
 	const gitPaths = findGitPaths(cwd);
-	if (!gitPaths) return undefined;
+	if (!gitPaths) return [];
 	const commonGitDir = canonicalizePath(gitPaths.commonGitDir);
 	const worktreeRoot = canonicalizePath(gitPaths.repoDir);
 	const mainRepoRoot = dirname(commonGitDir);
 	// False for an ordinary repo, where the two are the same dir, and for a sibling
 	// worktree (`git worktree add ../feat`), whose main repo is not an ancestor.
-	if (!worktreeRoot.startsWith(`${mainRepoRoot}${sep}`)) return undefined;
+	if (!worktreeRoot.startsWith(`${mainRepoRoot}${sep}`)) return [];
 	// dirname of the common git dir is the main worktree root only when that dir is
 	// itself checked out from the same repo. In a bare layout (`proj/.bare` +
 	// `proj/main`) it is just the directory holding `.bare`, which tracks nothing; a
 	// submodule's gitdir has no `commondir`, so it lands under `.git/modules`.
-	if (canonicalizePath(join(mainRepoRoot, ".git")) !== commonGitDir) return undefined;
-	const worktreeContextFile = loadContextFileFromDir(worktreeRoot);
-	return worktreeContextFile ? join(mainRepoRoot, basename(worktreeContextFile.path)) : undefined;
+	if (canonicalizePath(join(mainRepoRoot, ".git")) !== commonGitDir) return [];
+	return loadContextFilesFromDir(worktreeRoot).map((file) => join(mainRepoRoot, basename(file.path)));
 }
 
 export function loadProjectContextFiles(options: {
@@ -126,25 +145,27 @@ export function loadProjectContextFiles(options: {
 	const contextFiles: Array<{ path: string; content: string }> = [];
 	const seenPaths = new Set<string>();
 
-	const globalContext = loadContextFileFromDir(resolvedAgentDir);
-	if (globalContext) {
+	for (const globalContext of loadContextFilesFromDir(resolvedAgentDir)) {
 		contextFiles.push(globalContext);
 		seenPaths.add(globalContext.path);
 	}
 
 	const ancestorContextFiles: Array<{ path: string; content: string }> = [];
 
-	const shadowedContextFile = findShadowedContextFile(resolvedCwd);
+	const shadowedContextFiles = new Set(findShadowedContextFiles(resolvedCwd));
 	let currentDir = resolvedCwd;
 
 	while (true) {
-		const contextFile = loadContextFileFromDir(currentDir);
-		const isShadowed =
-			shadowedContextFile !== undefined && canonicalizePath(contextFile?.path ?? "") === shadowedContextFile;
-		if (contextFile && !isShadowed && !seenPaths.has(contextFile.path)) {
-			ancestorContextFiles.unshift(contextFile);
+		const dirFiles = loadContextFilesFromDir(currentDir).filter(
+			(contextFile) =>
+				!shadowedContextFiles.has(canonicalizePath(contextFile.path)) && !seenPaths.has(contextFile.path),
+		);
+		for (const contextFile of dirFiles) {
 			seenPaths.add(contextFile.path);
 		}
+		// Unshift the whole buffer: per-dir order (AGENTS before DESIGN) is preserved
+		// while parents still land before children (top-most first).
+		ancestorContextFiles.unshift(...dirFiles);
 
 		const parentDir = dirname(currentDir);
 		if (parentDir === currentDir) break;

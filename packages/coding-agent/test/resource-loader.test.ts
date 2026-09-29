@@ -396,6 +396,62 @@ Content`,
 			]);
 		});
 
+		it("should discover DESIGN.md alongside AGENTS.md, AGENTS first", async () => {
+			writeFileSync(join(cwd, "AGENTS.md"), "project instructions");
+			writeFileSync(join(cwd, "DESIGN.md"), "design notes");
+
+			const loader = new DefaultResourceLoader({ cwd, agentDir });
+			await loader.reload();
+
+			expect(loader.getAgentsFiles().agentsFiles).toEqual([
+				{ path: join(cwd, "AGENTS.md"), content: "project instructions" },
+				{ path: join(cwd, "DESIGN.md"), content: "design notes" },
+			]);
+		});
+
+		it("should inherit DESIGN.md through ancestor directories, top-most first", async () => {
+			const nestedCwd = join(cwd, "service");
+			mkdirSync(nestedCwd);
+			writeFileSync(join(agentDir, "DESIGN.md"), "global design");
+			writeFileSync(join(cwd, "AGENTS.md"), "project instructions");
+			writeFileSync(join(cwd, "DESIGN.md"), "project design");
+			writeFileSync(join(nestedCwd, "DESIGN.md"), "service design");
+
+			const loader = new DefaultResourceLoader({ cwd: nestedCwd, agentDir });
+			await loader.reload();
+
+			expect(loader.getAgentsFiles().agentsFiles).toEqual([
+				{ path: join(agentDir, "DESIGN.md"), content: "global design" },
+				{ path: join(cwd, "AGENTS.md"), content: "project instructions" },
+				{ path: join(cwd, "DESIGN.md"), content: "project design" },
+				{ path: join(nestedCwd, "DESIGN.md"), content: "service design" },
+			]);
+		});
+
+		it("should prefer DESIGN.override.md within the DESIGN family", async () => {
+			writeFileSync(join(cwd, "DESIGN.md"), "design notes");
+			writeFileSync(join(cwd, "DESIGN.override.md"), "design override");
+
+			const loader = new DefaultResourceLoader({ cwd, agentDir });
+			await loader.reload();
+
+			expect(loader.getAgentsFiles().agentsFiles).toEqual([
+				{ path: join(cwd, "DESIGN.override.md"), content: "design override" },
+			]);
+		});
+
+		it("should ignore DESIGN.md candidates that are directories", async () => {
+			mkdirSync(join(cwd, "DESIGN.md"));
+			writeFileSync(join(cwd, "AGENTS.md"), "project instructions");
+
+			const loader = new DefaultResourceLoader({ cwd, agentDir });
+			await loader.reload();
+
+			expect(loader.getAgentsFiles().agentsFiles).toEqual([
+				{ path: join(cwd, "AGENTS.md"), content: "project instructions" },
+			]);
+		});
+
 		it("should ignore context file candidates that are directories", async () => {
 			mkdirSync(join(cwd, "AGENTS.override.md"));
 			mkdirSync(join(cwd, "AGENTS.md"));
@@ -1015,6 +1071,19 @@ export default function(pi: ExtensionAPI) {
 			const files = loadProjectContextFiles({ cwd: worktreeSrc, agentDir });
 
 			expect(files.map((f) => f.content)).toEqual(["worktree instructions"]);
+		});
+
+		it("should shadow each context file independently in a nested worktree", () => {
+			const { main, worktree, worktreeSrc } = setupNestedWorktree();
+			writeFileSync(join(main, "AGENTS.md"), "main repo instructions");
+			writeFileSync(join(main, "DESIGN.md"), "main repo design");
+			writeFileSync(join(worktree, "DESIGN.md"), "worktree design");
+
+			const files = loadProjectContextFiles({ cwd: worktreeSrc, agentDir });
+
+			// The worktree's DESIGN.md shadows only the main repo's DESIGN.md;
+			// AGENTS.md is still inherited.
+			expect(files.map((f) => f.content)).toEqual(["main repo instructions", "worktree design"]);
 		});
 
 		it("should still inherit the main repo's context when the worktree root has none", () => {
