@@ -10,6 +10,36 @@
 	"bin": {
 		"deu": "dist/bundle/cli.js"
 	},
+	"pi":{
+	"extensions": [
+      ".src/extensions",
+      "./node_modules/pi-subagents/index.js",
+      "./node_modules/pi-mcp-adapter/index.ts",
+      "./node_modules/pi-web-access/dist",
+      "./node_modules/@gotgenes/pi-permission-system/src/index.ts",
+      "./node_modules/@juicesharp/rpiv-ask-user-question/index.ts",
+      "./node_modules/@juicesharp/rpiv-todo/index.ts",
+      "./node_modules/@schovest/pi-goal/src/index.ts",
+      "./node_modules/@upstash/context7-pi/extensions",
+      "./node_modules/pi-cache-optimizer/index.ts",
+      "./node_modules/pi-hermes-memory/src/index.ts",
+      "./node_modules/pi-rewind-hook/index.ts",
+      "./node_modules/@tylerho/pi-worktree/extensions",
+      "./node_modules/@aliou/pi-guardrails/extensions"
+    ],
+    "skills": [
+      "./src/skills",
+      "./node_modules/pi-subagents/skills",
+      "./node_modules/@upstash/context7-pi/skills",
+      "./node_modules/@aliou/pi-utils-settings/skills",
+      "./node_modules/@aliou/sh/skills"
+    ],
+    "prompts": [
+      "./src/prompts",
+      "./node_modules/pi-subagents/prompts",
+      "./node_modules/@upstash/context7-pi/prompts"
+    ]
+	},
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"exports": {
@@ -55,6 +85,19 @@
 		"@earendil-works/pi-ai": "^0.87.1",
 		"@earendil-works/pi-tui": "^0.87.1",
 		"@silvia-odwyer/photon-node": "0.3.4",
+		"@gotgenes/pi-permission-system": "35.0.1",
+    "@juicesharp/rpiv-ask-user-question": "2.11.0",
+    "@juicesharp/rpiv-todo": "2.11.0",
+    "@schovest/pi-goal": "0.2.0",
+    "@upstash/context7-pi": "0.1.2",
+    "pi-cache-optimizer": "2.8.11",
+    "pi-hermes-memory": "0.9.9",
+    "pi-mcp-adapter": "3.1.0",
+    "pi-rewind-hook": "1.8.7",
+    "pi-subagents": "0.73.1",
+    "pi-web-access": "0.33.0",
+    "@tylerho/pi-worktree": "0.2.1",
+    "@aliou/pi-guardrails": "0.19.0",
 		"chalk": "6.0.0",
 		"cross-spawn": "7.0.6",
 		"diff": "8.0.4",
@@ -68,7 +111,8 @@
 		"semver": "7.8.5",
 		"typebox": "1.3.27",
 		"undici": "8.10.2",
-		"yaml": "2.9.0"
+		"yaml": "2.9.0",
+		"zod": "^4.6.5"
 	},
 	"overrides": {
 		"protobufjs": "7.6.6"
@@ -82,6 +126,7 @@
 		"@types/node": "22.19.19",
 		"@types/proper-lockfile": "4.1.4",
 		"@types/semver": "7.7.1",
+		"typebox": "1.3.34",
 		"marked": "18.0.11",
 		"shx": "0.4.0",
 		"vitest": "4.1.9"
@@ -104,5 +149,20 @@
 	},
 	"engines": {
 		"node": ">=22.19.0"
-	}
+	},
+	"bundleDependencies": [
+    "pi-subagents",
+    "pi-mcp-adapter",
+    "pi-web-access",
+    "@juicesharp/rpiv-ask-user-question",
+    "@gotgenes/pi-permission-system",
+    "@upstash/context7-pi",
+    "@schovest/pi-goal",
+    "pi-hermes-memory",
+    "@aliou/pi-guardrails",
+    "@tylerho/pi-worktree",
+    "@juicesharp/rpiv-todo",
+    "pi-cache-optimizer",
+    "pi-rewind-hook"
+  ]
 }
