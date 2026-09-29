@@ -1,7 +1,7 @@
 {
 	"name": "@earendil-works/pi-coding-agent",
 	"version": "0.87.1",
-	"description": "Deu agent CLI (rebrand de Pi, fork deuriib/pi) con read, bash, edit, write tools y session management",
+	"description": "Deu agent CLI con read, bash, edit, write tools y session management",
 	"type": "module",
 	"piConfig": {
 		"name": "deu",
@@ -92,7 +92,8 @@
 		"llm",
 		"cli",
 		"tui",
-		"agent"
+		"agent",
+		"deu"
 	],
 	"author": "Mario Zechner",
 	"license": "MIT",
