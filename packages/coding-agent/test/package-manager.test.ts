@@ -1593,6 +1593,27 @@ Content`,
 			expect(result.extensions.some((r) => isEnabled(r, "remote.ts"))).toBe(true);
 			expect(result.extensions.some((r) => pathEndsWith(r.path, "skip.ts"))).toBe(false);
 		});
+		it("should resolve manifest node_modules entries hoisted to an ancestor", async () => {
+			const hoistedDir = join(tempDir, "node_modules/dep/extensions");
+			mkdirSync(hoistedDir, { recursive: true });
+			writeFileSync(join(hoistedDir, "remote.ts"), "export default function() {}");
+			const pkgDir = join(tempDir, "hoisted-pkg");
+			mkdirSync(join(pkgDir, "extensions"), { recursive: true });
+			writeFileSync(join(pkgDir, "extensions", "local.ts"), "export default function() {}");
+			writeFileSync(
+				join(pkgDir, "package.json"),
+				JSON.stringify({
+					name: "hoisted-pkg",
+					pi: {
+						extensions: ["extensions", "./node_modules/dep/extensions"],
+					},
+				}),
+			);
+
+			const result = await packageManager.resolveExtensionSources([pkgDir]);
+			expect(result.extensions.some((r) => isEnabled(r, "local.ts"))).toBe(true);
+			expect(result.extensions.some((r) => isEnabled(r, "remote.ts"))).toBe(true);
+		});
 
 		it("should support glob patterns in manifest skills", async () => {
 			const pkgDir = join(tempDir, "skill-manifest-pkg");
