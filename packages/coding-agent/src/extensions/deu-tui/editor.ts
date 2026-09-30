@@ -1,9 +1,13 @@
-import {
-	CustomEditor,
-	type ExtensionAPI,
-	type ExtensionContext,
-	type KeybindingsManager,
+import type {
+	ExtensionAPI,
+	ExtensionContext,
+	KeybindingsManager,
 } from "@earendil-works/pi-coding-agent";
+// Direct import (not via the package barrel): editor.ts is itself reached
+// through the barrel (extensions/index), so extending a barrel-provided
+// class here is a cycle that esbuild's bundle chunk ordering cannot satisfy
+// ("Class extends value undefined" at startup). The deep module has no cycle.
+import { CustomEditor } from "../../modes/interactive/components/custom-editor.ts";
 import type { EditorTheme, TuiMouseEvent, TuiMouseEventResult, TUI } from "@earendil-works/pi-tui";
 import { CURSOR_MARKER, truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 import type { CursorStyle } from "./config.ts";
